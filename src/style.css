@@ -1,0 +1,33 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+:root {
+  --blue-900: hsl(209, 23%, 22%);
+  --blue-950: hsl(207, 26%, 17%);
+  --grey-950: hsl(200, 15%, 8%);
+  --grey-400: hsl(0, 0%, 50%);
+  --grey-50: hsl(0, 0%, 99%);
+  --white: hsl(0, 100%, 100%);
+}
+body {
+  font-family: "Nunito Sans", sans-serif;
+  background-color: var(--grey-50);
+}
+html.dark body {
+  background-color: var(--blue-950);
+}
+
+.rod-shadow {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.regions-filter > li {
+  @apply hover:cursor-pointer;
+}
+.country-info > li> span{
+@apply font-semibold
+}
+.country-detail > li{
+    color: var(--grey-950)
+}
+.country-detail > li >span{
+@apply font-semibold mr-2 text-black;
+}
