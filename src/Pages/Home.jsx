@@ -21,7 +21,8 @@ export default function Home(props) {
                 let endpoint = 'https://restcountries.com/v3.1/all';
                 if (searchTerm) {
                     // endpoint = `https://restcountries.com/v3.1/name/${searchTerm}`
-                    endpoint = `https://restcountries.com/v3.1/name/${searchTerm}?fullText=true`;
+                    let query = searchTerm.trim();
+                    endpoint = `https://restcountries.com/v3.1/name/${query}?fullText=true`;
                 }
                 if (region && !searchTerm) {
                     endpoint = `https://restcountries.com/v3.1/region/${region}`;
@@ -99,7 +100,7 @@ export default function Home(props) {
                     </div>
                 </div>
             </section>
-            <section>
+            <section className='lg:px-4'>
                 {
                     loading ?
                         <div className='flex justify-center min-h-[20rem] items-center'>
