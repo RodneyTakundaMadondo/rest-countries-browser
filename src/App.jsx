@@ -8,10 +8,10 @@ export function App() {
     // const [currentPage, setCurrentPage] = useState("Body");
     const [areaInfo, setAreaInfo] = useState(null);
 
-  
+
     return (
 
-        <BrowserRouter>
+        <BrowserRouter basename="/rest-countries-browser/">
             <Routes>
                 <Route element={<Layout />} >
                     <Route path="/" element={<Home setAreaInfo={setAreaInfo} />} />
