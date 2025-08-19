@@ -22,12 +22,15 @@ html.dark body {
 .regions-filter > li {
   @apply hover:cursor-pointer;
 }
-.country-info > li> span{
-@apply font-semibold
+.country-info > li > span {
+  @apply font-semibold;
 }
-.country-detail > li{
-    color: var(--grey-950)
+.country-detail > li {
+  color: var(--grey-950);
 }
-.country-detail > li >span{
-@apply font-semibold mr-2 text-black;
+.country-detail > li > span {
+  @apply font-semibold mr-2 text-black;
+}
+.pagin-btn.active {
+  @apply font-bold dark:border-white border-black;
 }
