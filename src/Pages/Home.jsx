@@ -1,19 +1,62 @@
 // eslint-disable-next-line no-unused-vars
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { MoonLoader } from 'react-spinners';
 import { Link } from 'react-router-dom'
 
-// const AreaContext = useContext();
 export default function Home(props) {
     const [regionDropDown, setRegionDropDown] = useState(false);
     const [data, setData] = useState(null);
-    const regionsArr = ["Africa", "America", "Asia", "Europe", "Oceania"];
+    const regionsArr = ["All", "Africa", "America", "Asia", "Europe", "Oceania"];
     const [region, setRegion] = useState(null);
     const [activeOption, setActiveOption] = useState(null);
     let [loading, setLoading] = useState(true);
 
     const [searchTerm, setSearchTerm] = useState("");
     const [inputValue, setInputValue] = useState("");
+    const dropDownRef = useRef(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 8;
+
+
+
+    const totalPages = data ? Math.ceil(data.length / itemsPerPage) : 0;
+    const currentItems = data ? data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage) : [];
+    // Pagination Variables
+    const numbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+    const visibleCount = 5;
+    const [startIndex, setStartIndex] = useState(0);
+
+    const handleClick = (index) => {
+        // const globalIndex = startIndex + index;
+
+        // Calculate new start index so that clicked number is "positioned" appropriately
+        let newStart = startIndex;
+
+        if (index === visibleCount - 2) {
+            // second-to-last clicked → slide forward 1
+            newStart = Math.min(startIndex + 1, numbers.length - visibleCount);
+        } else if (index === visibleCount - 1) {
+            // last clicked → slide forward 2
+            newStart = Math.min(startIndex + 2, numbers.length - visibleCount);
+        } else if (index === 1) {
+            // second button → slide backward 1
+            newStart = Math.max(startIndex - 1, 0);
+        } else if (index === 0) {
+            // first button → slide backward 2
+            newStart = Math.max(startIndex - 2, 0);
+        }
+
+        setStartIndex(newStart);
+    };
+
+    const visibleNumbers = numbers.slice(startIndex, startIndex + visibleCount)
+    //Pagination Variables
+
+
+    function handlePagination(number, index) {
+        setCurrentPage(number);
+        handleClick(index)
+    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -24,8 +67,10 @@ export default function Home(props) {
                     let query = searchTerm.trim();
                     endpoint = `https://restcountries.com/v3.1/name/${query}?fullText=true`;
                 }
-                if (region && !searchTerm) {
+                if (region && !searchTerm && region !== "All") {
                     endpoint = `https://restcountries.com/v3.1/region/${region}`;
+                } else if (region == "All") {
+                    endpoint = "https://restcountries.com/v3.1/all";
                 }
 
                 const res = await fetch(`${endpoint}?fields=name,languages,borders,capital,region,subregion,flags,population,tld,currencies`);
@@ -37,6 +82,7 @@ export default function Home(props) {
                     const json = await res.json();
 
                     setData(json);
+                    console.log(json);
                     setLoading(false);
                 }
 
@@ -48,9 +94,24 @@ export default function Home(props) {
         fetchData();
     }, [region, searchTerm])
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropDownRef.current && !dropDownRef.current.contains(event.target)) {
+                setRegionDropDown(false)
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside)
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside)
+        }
+    }, [])
+
     function handleSearch(e) {
         e.preventDefault();
+        setRegion("")
         setSearchTerm(inputValue);
+        setActiveOption(null)
     }
 
     function handleRegionStuff(reg) {
@@ -77,19 +138,21 @@ export default function Home(props) {
                         </form>
                     </div>
 
-                    <div className="relative w-[min(100%,15rem)] min-w-[10.4rem] p-4 rounded-md bg-white dark:bg-[var(--blue-900)] rod-shadow flex justify-between dark:text-white ">
+                    <div
+                        ref={dropDownRef}
+                        onClick={() => { setRegionDropDown(prev => !prev) }}
+                        className="relative w-[min(100%,15rem)] min-w-[10.4rem] p-4 rounded-md bg-white dark:bg-[var(--blue-900)] rod-shadow flex justify-between dark:text-white hover:cursor-pointer ">
                         <span className='font-semibold'>Filter by Region</span>
                         <button
-                            onClick={() => { setRegionDropDown(prev => !prev) }}
                         >
                             <i className={`fa-solid fa-chevron-${regionDropDown ? "up" : "down"}`}></i>
                         </button>
                         <ul className={`rod-shadow absolute rounded-md z-50 left-0 space-y-2 -bottom-2 translate-y-full  flex-col w-full p-4  bg-white dark:bg-[var(--blue-900)] ${regionDropDown ? "flex" : "hidden"} regions-filter`}>
                             {
                                 regionsArr.map((reg, index) => (
-                                    <li key={index} onClick={() => { setActiveOption(reg) }} className={`p-2 ${activeOption === reg ? "rod-shadow font-bold" : ""}`}>
+                                    <li key={index} onClick={() => { setActiveOption(reg) }} className={`p-2 ${activeOption === reg ? "rod-shadow font-bold" : ""} hover:bg-[#2b7fff] `}>
                                         <button
-                                            className='w-full text-start'
+                                            className='w-full text-start hover:cursor-pointer'
                                             onClick={() => { handleRegionStuff(reg) }}
                                         >{reg}
                                         </button></li>
@@ -103,15 +166,17 @@ export default function Home(props) {
             <section className='lg:px-4'>
                 {
                     loading ?
-                        <div className='flex justify-center min-h-[20rem] items-center'>
-                            <MoonLoader />
-                        </div>
+                        setTimeout(() => (
+                            <div className='flex justify-center min-h-[20rem] items-center'>
+                                <MoonLoader />
+                            </div>
+                        ), 3000)
                         :
                         <div className="bod-grid px-0 grid grid-cols-1 place-items-center gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  w-[min(100%,85rem)] mx-auto ">
                             {
-                                data ?
-                                    data.map((countryInfo, index) => (
-                                        <Link to={`/details/${countryInfo.name.common}`} key={index} onClick={() => { props.setAreaInfo(countryInfo) }} className={`card rod-shadow rounded-md w-[min(calc(100%-2rem),30rem)] xl:w-auto  max-h-[348px] dark:bg-[var(--blue-900)] `}>
+                                currentItems ?
+                                    currentItems.map((countryInfo, index) => (
+                                        <Link to={`/details/${countryInfo.name.common}`} key={index} onClick={() => { props.setAreaInfo(countryInfo) }} className={`card rod-shadow rounded-md w-[min(calc(100%-2rem),30rem)]   max-h-[348px] dark:bg-[var(--blue-900)] `}>
 
                                             <div className="country-flag w-full h-[12.5rem] overflow-hidden flex items-center justify-center rounded-tl-md rounded-tr-md ">
                                                 <img className=' w-full h-full object-center object-cover' src={countryInfo.flags.svg} alt="" />
@@ -146,7 +211,48 @@ export default function Home(props) {
                     Oops! We couldn’t find that country. Try another one?
                 </p>}
             </section>
+            <section className='mb-4 px-4'>
+                <div className='flex justify-center gap-2 dark:text-white'>
+                    <button 
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    ><i className="fa-solid fa-chevron-left"></i></button>
+                    <div className='flex justify-center gap-4 '>
+                        {
+                            visibleNumbers.map((number, index) => (
+                                <button 
+                                className={` border-solid border-2 border-[var(--grey-400)] transition duration-300 ease-in-out rounded-full h-10 w-10 pagin-btn ${currentPage === number? "active":""}`} 
+                                key={index} 
+                                onClick={() => { handlePagination(number, index) }}>
+                                    {number}
+                                </button>
+                            ))
+                        }
+                    </div>
+                    <button
+                     disabled={currentPage === totalPages}
+                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    ><i className="fa-solid fa-chevron-right"></i></button>
+                </div>
+
+            </section>
         </main>
-       
+
     )
 }
+
+                                // <button
+                                //     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                //     disabled={currentPage === 1}
+                                // >
+                                //     Prev
+                                // </button>
+                            
+                           
+                                // <button
+                                //     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                //     disabled={currentPage === totalPages}
+                                // >
+                                //     Next
+                                // </button>
+                     

@@ -88,7 +88,7 @@ export function Detail(props) {
                                     <div className="lg:w-[min(100%,20rem)]">
                                         <ul className="country-detail">
                                             <li className="dark:!text-[var(--grey-400)]"><span className="dark:!text-white">Top Level Domain:</span>{areaInfo.tld ? areaInfo.tld : "N/A"}</li>
-                                            <li className="dark:!text-[var(--grey-400)]"><span className="dark:!text-white">Currencies:</span>{currencyObj.name}</li>
+                                            <li className="dark:!text-[var(--grey-400)]"><span className="dark:!text-white">Currencies:</span>{currencyObj?.name}</li>
                                             <li className="dark:!text-[var(--grey-400)]"><span className="dark:!text-white">Languages:</span>{langObj.join(", ")}</li>
                                         </ul>
                                     </div>

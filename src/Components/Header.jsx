@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react'
 export function Header() {
     const [darkMode, setDarkMode] = useState(false);
-    useEffect(()=>{
+    const [themeStatus, setThemeStatus] = useState("")
+    useEffect(() => {
         const root = document.documentElement;
-        if(darkMode){
+        if (darkMode) {
             root.classList.add("dark");
-
-        }else{
+            setThemeStatus("Light Mode")
+        } else {
             root.classList.remove("dark");
+            setThemeStatus("Dark Mode")
         }
-    },[darkMode])
+    }, [darkMode])
 
     return (
         <header className="px-4 py-6 bg-white shadow-md dark:bg-[var(--blue-900)] ">
@@ -17,13 +19,13 @@ export function Header() {
                 <h1 className="font-black">
                     Where in the world?
                 </h1>
-            
+
                 <button
                     onClick={() => { setDarkMode(prev => !prev) }}
                     className="flex gap-2 transition-transform duration-200 hover:scale-105 active:scale-95">
                     <span><i className="fa-regular   fa-moon"></i></span>
                     <span className="font-semibold">
-                        Dark Mode
+                        {themeStatus}
                     </span>
                 </button>
 
