@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
+import { CiLight } from "react-icons/ci";
 export function Header() {
     const [darkMode, setDarkMode] = useState(false);
     const [themeStatus, setThemeStatus] = useState("")
@@ -22,8 +23,11 @@ export function Header() {
 
                 <button
                     onClick={() => { setDarkMode(prev => !prev) }}
-                    className="flex gap-2 transition-transform duration-200 hover:scale-105 active:scale-95">
-                    <span><i className="fa-regular   fa-moon"></i></span>
+                    className="flex items-center gap-2 transition-transform duration-200 hover:scale-105 active:scale-95">
+                    {
+                        themeStatus === "Light Mode" ?
+                            <CiLight /> : <span><i className="fa-regular   fa-moon"></i></span>
+                    }
                     <span className="font-semibold">
                         {themeStatus}
                     </span>
