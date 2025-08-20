@@ -176,7 +176,7 @@ export default function Home(props) {
                             {
                                 currentItems ?
                                     currentItems.map((countryInfo, index) => (
-                                        <Link to={`/details/${countryInfo.name.common}`} key={index} onClick={() => { props.setAreaInfo(countryInfo) }} className={`card rod-shadow rounded-md w-[min(calc(100%-2rem),30rem)]   max-h-[348px] dark:bg-[var(--blue-900)] `}>
+                                        <Link to={`/details/${countryInfo.name.common}`} key={index} onClick={() => { props.setAreaInfo(countryInfo) }} className={`card cursor-pointer hover:-translate-y-2 duration-300 transition-all rod-shadow rounded-md w-[min(calc(100%-2rem),30rem)]   max-h-[348px] dark:bg-[var(--blue-900)] `}>
 
                                             <div className="country-flag w-full h-[12.5rem] overflow-hidden flex items-center justify-center rounded-tl-md rounded-tr-md ">
                                                 <img className=' w-full h-full object-center object-cover' src={countryInfo.flags.svg} alt="" />
@@ -213,26 +213,51 @@ export default function Home(props) {
             </section>
             <section className='mb-4 px-4'>
                 <div className='flex justify-center gap-2 dark:text-white'>
-                    <button 
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    ><i className="fa-solid fa-chevron-left"></i></button>
+                    <button
+                        disabled={currentPage === 1}
+                        onClick={() => {
+                            setCurrentPage(prev => {
+                                const newPage = Math.max(prev - 1, 1);
+
+                                // If you moved to the first button in the visible slice, slide window backward
+                                const indexInVisible = visibleNumbers.indexOf(newPage);
+                                handleClick(indexInVisible);
+
+                                return newPage;
+                            });
+                        }}
+                    >
+                        <i className="fa-solid fa-chevron-left"></i>
+                    </button>
                     <div className='flex justify-center gap-4 '>
                         {
                             visibleNumbers.map((number, index) => (
-                                <button 
-                                className={` border-solid border-2 border-[var(--grey-400)] transition duration-300 ease-in-out rounded-full h-10 w-10 pagin-btn ${currentPage === number? "active":""}`} 
-                                key={index} 
-                                onClick={() => { handlePagination(number, index) }}>
+                                <button
+                                    className={` border-solid border-2 border-[var(--grey-400)] transition duration-300 ease-in-out rounded-full h-10 w-10 pagin-btn ${currentPage === number ? "active" : ""}`}
+                                    key={index}
+                                    onClick={() => { handlePagination(number, index) }}
+                                >
                                     {number}
                                 </button>
                             ))
                         }
                     </div>
                     <button
-                     disabled={currentPage === totalPages}
-                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    ><i className="fa-solid fa-chevron-right"></i></button>
+                        disabled={currentPage === totalPages}
+                        onClick={() => {
+                            setCurrentPage(prev => {
+                                const newPage = Math.min(prev + 1, totalPages);
+
+                                // If you moved to the last button in the visible slice, slide window forward
+                                const indexInVisible = visibleNumbers.indexOf(newPage);
+                                handleClick(indexInVisible);
+
+                                return newPage;
+                            });
+                        }}
+                    >
+                        <i className="fa-solid fa-chevron-right"></i>
+                    </button>
                 </div>
 
             </section>
@@ -241,18 +266,3 @@ export default function Home(props) {
     )
 }
 
-                                // <button
-                                //     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                                //     disabled={currentPage === 1}
-                                // >
-                                //     Prev
-                                // </button>
-                            
-                           
-                                // <button
-                                //     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                                //     disabled={currentPage === totalPages}
-                                // >
-                                //     Next
-                                // </button>
-                     
